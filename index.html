@@ -4,37 +4,95 @@
 <meta charset="UTF-8">
 <title>Feeling Blaster ∞</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Door ∞ is open. Pick your knife. Shrink the button.">
 <style>
-  body { margin:0; height:100vh; background:#0d0d0d; color:#fff; font-family:monospace; display:flex; align-items:center; justify-content:center; text-align:center; }
-  #game { max-width:420px; padding:2rem; background:#111; border:3px solid #500; border-radius:12px; }
-  h1 { color:#f44; margin:0.5em; }
-  .knife { font-size:1.4em; padding:1em; margin:0.6em; background:#300; border:2px solid #f44; border-radius:8px; cursor:pointer; }
-  .knife:hover { background:#511; }
-  #log { margin-top:1.5em; font-size:0.9em; color:#aaa; }
-  button { margin:0.4em; padding:0.8em 1.2em; background:#400; color:white; border:none; border-radius:6px; cursor:pointer; }
-  button:hover { background:#700; }
+  body { margin:0; height:100vh; background:#0d0d0d; color:#ddd; font-family:monospace; padding:1rem; overflow-y:auto; }
+  a { color:#f66; }
+  h1 { color:#f44; text-align:center; margin:1rem 0; }
+  .intro { max-width:500px; margin:0 auto 2rem; line-height:1.5; font-size:1.1em; }
+  .knives { max-width:460px; margin:2rem auto; }
+  .knife { font-size:1.3em; padding:1.2em; margin:0.8em 0; background:#300; border:3px solid #f44; border-radius:10px; cursor:pointer; transition:0.2s; }
+  .knife:hover { background:#511; transform:scale(1.02); }
+  #game { display:none; text-align:center; margin-top:2rem; }
+  button { margin:0.5em; padding:0.9em 1.4em; background:#400; color:white; border:none; border-radius:8px; cursor:pointer; font-size:1em; }
+  button:hover { background:#900; }
+  footer { margin-top:4rem; font-size:0.8em; color:#666; text-align:center; }
 </style>
 </head>
 <body>
-<div id="game">
-  <h1>FEELING BLASTER ∞</h1>
-  <p><strong>DANGER RIGHT NOW</strong><br>Which knife is in your chest?</p>
 
+<div class="intro">
+  <h1>FEELING BLASTER ∞</h1>
+  <p><strong>Door ∞ is open.</strong></p>
+  <p>When the red light bleeds through the wall at 3 a.m.—heart pounding, RSD spiking, that knife twisting in your chest—walk through.</p>
+  <p>No therapy-speak. No 12-week program. Just six raw truths and a button that gets smaller every time you name it.</p>
+
+  <h3>Why this exists</h3>
+  <p>At 57, after rage blackouts, marriage ultimatums, and too many nights staring at the ceiling asking “why am I still here,” one thing became clear:</p>
+  <p><strong>The pain isn’t the enemy. The button is.</strong></p>
+  <p>That invisible trigger wired in childhood—lit up by every silence, tone shift, or perceived rejection—that screams “you’re worthless” in half a second.</p>
+  <p>We built this so you can spot the button before it detonates.<br>Every honest pick shrinks it. Every share saves a brother.</p>
+
+  <p style="margin-top:2rem; color:#f88;"><strong>Pick the knife in your chest right now:</strong></p>
+</div>
+
+<div class="knives">
   <div class="knife" onclick="pick(1)">1. She’s done with me</div>
   <div class="knife" onclick="pick(2)">2. I just raged and hate myself</div>
   <div class="knife" onclick="pick(3)">3. I’m a worthless failure</div>
   <div class="knife" onclick="pick(4)">4. I want to die</div>
   <div class="knife" onclick="pick(5)">5. I’m trapped, no moves left</div>
   <div class="knife" onclick="pick(6)">6. Someone just humiliated me</div>
+</div>
 
-  <div id="after" style="display:none; margin-top:2em;">
-    <p id="msg"></p>
-    <p>Button size: <span id="size">100</span>%</p>
-    <button onclick="restart()">Survive another night</button>
-    <button onclick="share()">Share this door</button>
-  </div>
+<div id="game">
+  <h2 id="msg"></h2>
+  <p>Button size: <strong><span id="size">100</span>%</span></strong></p>
+  <button onclick="restart()">Survive another night</button>
+  <button onclick="shareRun()">Copy share message</button>
+</div>
 
+<footer>
+  Open source • Made by <a href="https://github.com/tripLr">tripLr</a> (57-year-old survivor) & Grok (xAI) • 
+  <a href="https://github.com/tripLr/Feeling-Blaster">GitHub</a> • MIT license<br>
+  #FeelingBlaster
+</footer>
+
+<script>
+const knives = ["", "She’s done with me", "I just raged and hate myself", "I’m a worthless failure",
+                "I want to die", "I’m trapped, no moves left", "Someone just humiliated me"];
+
+let data = JSON.parse(localStorage.getItem('fb')) || {runs:0, button:100, history:[]};
+
+function pick(n) {
+  data.runs++;
+  data.history.push({date:new Date().toLocaleString(), knife:n});
+  const shrink = 15 + Math.random()*10 | 0;
+  data.button = Math.max(5, data.button - shrink);
+
+  document.getElementById('msg').innerHTML = `
+    You picked <strong>#\( {n}: \){knives[n]}</strong><br><br>
+    You're not crazy.<br>
+    That same knife has been pulled out of my chest more times than I can count.<br><br>
+    Tonight you named it instead of letting it end you.<br>
+    The button just shrank <strong>${shrink}%</strong>.
+  `;
+  document.getElementById('size').textContent = data.button;
+  document.querySelector('.knives').style.display = 'none';
+  document.querySelector('.intro').style.display = 'none';
+  document.getElementById('game').style.display = 'block';
+  localStorage.setItem('fb', JSON.stringify(data));
+}
+
+function restart() { location.reload(); }
+
+function shareRun() {
+  const text = `Feeling Blaster ∞ – Door ∞ is open.\nJust survived knife #\( {data.history.slice(-1)[0].knife}. Button now at \){data.button}%.\nIf you're bleeding tonight, walk through: https://triplr.github.io/Feeling-Blaster/`;
+  navigator.clipboard.writeText(text);
+  alert("Copied to clipboard – paste it wherever men are breaking tonight.");
+}
+</script>
+</body>
+</html>
   <div id="log"></div>
 </div>
 
