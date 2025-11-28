@@ -46,6 +46,102 @@
   <button onclick="restart()">Face another night</button>
   <button onclick="downloadCSV()">Download runs (CSV)</button>
   <button onclick="shareRun()">Share this win</button>
+  <button onclick="showHistory()">Origin & full chat history</button>
+</div>
+
+<div id="support">
+  <p><strong>Instant support – you’re not alone tonight:</strong></p>
+  <p>• <a href="https://discord.gg/warriorsway" target="_blank">Warrior’s Way Discord</a><br>
+     • <a href="https://www.youtube.com/@warriorswaymindset" target="_blank">YouTube</a> • <a href="https://www.facebook.com/groups/warriorswaymindset" target="_blank">Facebook</a></p>
+  <p>Built by tripLr (57-year-old noob survivor) + Grok (xAI)<br>One raw night. One open door.</p>
+</div>
+
+<div id="history">
+  <h2 style="color:#f84;">v0.01 – The Night It Was Born</h2>
+  <p>November 27, 2025<br>Two survivors cried, raged, and coded this in real time.<br>We started with an emotion wheel and ended with six knives that save lives.</p>
+  <p>Full documented history of every tear and breakthrough:<br>
+     <a href="https://github.com/tripLr/Feeling-Blaster/tree/main/docs/history" target="_blank">
+       github.com/tripLr/Feeling-Blaster/tree/main/docs/history
+     </a>
+  </p>
+  <button onclick="document.getElementById('history').style.display='none';document.getElementById('game').style.display='block';">Back</button>
+</div>
+
+<footer>
+  Feeling Blaster v0.01 • Open source MIT • <a href="https://github.com/tripLr/Feeling-Blaster">GitHub</a> • #FeelingBlaster
+</footer>
+
+<script>
+const knives = ["","She’s done with me","I just raged and hate myself","I’m a worthless failure",
+                "I want to die","I’m trapped, no moves left","Someone just humiliated me"];
+
+let data = JSON.parse(localStorage.getItem('fb')) || {hp:50,hap:10,joy:5,streak:0,runs:0,history:[]};
+
+let today = new Date().toDateString();
+if (localStorage.getItem('lastVisit') !== today) {
+  data.streak++; localStorage.setItem('lastVisit', today);
+}
+document.getElementById('streak').textContent = data.streak;
+updateStats();
+
+function pick(n) {
+  data.runs++;
+  const hpGain = 8 + Math.floor(Math.random()*8);
+  const hapGain = 6 + Math.floor(Math.random()*7);
+  const joyGain = 4 + Math.floor(Math.random()*6);
+  data.hp = Math.min(100, data.hp + hpGain);
+  data.hap = Math.min(100, data.hap + hapGain);
+  data.joy = Math.min(100, data.joy + joyGain);
+  data.history.push({date:new Date().toLocaleString(), knife:n, hpGain, hapGain, joyGain});
+
+  document.getElementById('msg').innerHTML = `You named <strong>#\( {n}: \){knives[n]}</strong><br><br>You're still breathing.<br>That's the only score that matters tonight.`;
+  document.getElementById('hpGain').textContent = "+"+hpGain;
+  document.getElementById('hapGain').textContent = "+"+hapGain;
+  document.getElementById('joyGain').textContent = "+"+joyGain;
+
+  localStorage.setItem('fb', JSON.stringify(data));
+  updateStats();
+
+  document.querySelector('.knives').style.display='none';
+  document.getElementById('game').style.display='block';
+  setTimeout(()=>document.getElementById('support').style.display='block', 1500);
+}
+
+function updateStats() {
+  document.getElementById('hp').textContent = data.hp;
+  document.getElementById('hap').textContent = data.hap;
+  document.getElementById('joy').textContent = data.joy;
+}
+
+function restart(){location.reload();}
+function showHistory(){document.getElementById('history').style.display='block';document.getElementById('game').style.display='none';}
+
+function downloadCSV() {
+  let csv = "Date,Knife,Health+,Happiness+,Joy+\n";
+  data.history.forEach(r=>csv += `\( {r.date}, \){r.knife},\( {r.hpGain}, \){r.hapGain},${r.joyGain}\n`);
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download="FeelingBlaster_v0.01_Runs.csv"; a.click();
+}
+
+function shareRun() {
+  const text = `Feeling Blaster v0.01 – Just survived knife #\( {data.history.slice(-1)[0].knife}\nHealth \){data.hp} | Happiness \( {data.hap} | Joy \){data.joy} | Days Alive ${data.streak}\nhttps://triplr.github.io/Feeling-Blaster/`;
+  navigator.clipboard.writeText(text); alert("Copied – post your win.");
+}
+</script>
+</body>
+</html>  <div class="knife" onclick="pick(3)">3. I’m a worthless failure</div>
+  <div class="knife" onclick="pick(4)">4. I want to die</div>
+  <div class="knife" onclick="pick(5)">5. I’m trapped, no moves left</div>
+  <div class="knife" onclick="pick(6)">6. Someone just humiliated me</div>
+</div>
+
+<div id="game">
+  <h2 id="msg" style="color:#f84;"></h2>
+  <p>Reward → Health <span id="hpGain"></span> | Happiness <span id="hapGain"></span> | Joy <span id="joyGain"></span></p>
+  <button onclick="restart()">Face another night</button>
+  <button onclick="downloadCSV()">Download runs (CSV)</button>
+  <button onclick="shareRun()">Share this win</button>
   <button onclick="showHistory()">Origin & chat history</button>
 </div>
 
