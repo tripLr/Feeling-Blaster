@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pain Vault – Loss System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { margin:0; background:#0a0000; color:#ddd; font-family:monospace; padding:1rem; text-align:center; line-height:1.6; }
+  h1 { color:#c00; margin:1rem 0; }
+  .stats { font-size:1.1em; margin:1.5rem 0; color:#f84; }
+  .knives { max-width:460px; margin:2rem auto; }
+  .knife { font-size:1.3em; padding:1.2em; margin:0.8em 0; background:#200; border:3px solid #c00; border-radius:10px; cursor:pointer; }
+  .knife:hover { background:#400; }
+  #game, #next { display:none; margin-top:2rem; }
+  button { margin:0.5em; padding:0.9em 1.4em; background:#400; color:white; border:none; border-radius:8px; cursor:pointer; }
+  button:hover { background:#900; }
+  a { color:#f84; }
+</style>
+</head>
+<body>
+
+<h1>PAIN VAULT</h1>
+<p><strong>Loss System Wing</strong><br>Denial • Anger • Bargaining • Sadness</p>
+<p>Health: <span id="hp">50</span>/100 Happiness: <span id="hap">10</span>/100 Joy: <span id="joy">5</span>/100</p>
+
+<div class="knives">
+  <div class="knife" onclick="pick(1)">1. I can’t accept she’s gone/changed</div>
+  <div class="knife" onclick="pick(2)">2. I’m furious at her/God/myself</div>
+  <div class="knife" onclick="pick(3)">3. If I do X maybe she’ll come back</div>
+  <div class="knife" onclick="pick(4)">4. Everything is empty without her</div>
+  <div class="knife" onclick="pick(5)">5. I’ll never feel okay again</div>
+  <div class="knife" onclick="pick(6)">6. This pain defines me now</div>
+</div>
+
+<div id="game">
+  <h2 style="color:#f84;">You faced the Loss System tonight.</h2>
+  <p>Reward → Health <span id="hpGain"></span> | Happiness <span id="hapGain"></span> | Joy <span id="joyGain"></span></p>
+  <button onclick="location.reload()">Bleed again</button>
+  <button onclick="downloadCSV()">Download runs</button>
+</div>
+
+<div id="next">
+  <p>Starting to feel a crack of acceptance?<br>
+     <em>The next wing opens when you’re ready.</em></p>
+  <button onclick="window.location.href='index.html'">← Back to Door ∞</button>
+</div>
+
+<script>
+const data = JSON.parse(localStorage.getItem('fb')) || {hp:50,hap:10,joy:5,history:[]};
+document.getElementById('hp').textContent = data.hp;
+document.getElementById('hap').textContent = data.hap;
+document.getElementById('joy').textContent = data.joy;
+
+function pick(n) {
+  const hpGain = 10 + Math.floor(Math.random()*10);
+  const hapGain = 8 + Math.floor(Math.random()*8);
+  const joyGain = 6 + Math.floor(Math.random()*7);
+  data.hp = Math.min(100, data.hp + hpGain);
+  data.hap = Math.min(100, data.hap + hapGain);
+  data.joy = Math.min(100, data.joy + joyGain);
+  data.history.push({date:new Date().toLocaleString(), vault:"Pain", knife:n, hpGain, hapGain, joyGain});
+
+  document.getElementById('hpGain').textContent = "+"+hpGain;
+  document.getElementById('hapGain').textContent = "+"+hapGain;
+  document.getElementById('joyGain').textContent = "+"+joyGain;
+
+  localStorage.setItem('fb', JSON.stringify(data));
+  document.querySelector('.knives').style.display='none';
+  document.getElementById('game').style.display='block';
+  setTimeout(()=>document.getElementById('next').style.display='block', 2000);
+}
+
+function downloadCSV() {
+  let csv = "Date,Wing,Knife,Health+,Happiness+,Joy+\n";
+  JSON.parse(localStorage.getItem('fb')).history.forEach(r=> {
+    csv += `\( {r.date}, \){r.vault||""},\( {r.knife}, \){r.hpGain},\( {r.hapGain}, \){r.joyGain}\n`;
+  });
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download="PainVault_Runs.csv"; a.click();
+}
+</script>
+</body>
+</html>
