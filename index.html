@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Feeling Blaster ∞</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Door ∞ is open. Pick your knife. Shrink the button.">
+<style>
+  body { margin:0; height:100vh; background:#0d0d0d; color:#fff; font-family:monospace; display:flex; align-items:center; justify-content:center; text-align:center; }
+  #game { max-width:420px; padding:2rem; background:#111; border:3px solid #500; border-radius:12px; }
+  h1 { color:#f44; margin:0.5em; }
+  .knife { font-size:1.4em; padding:1em; margin:0.6em; background:#300; border:2px solid #f44; border-radius:8px; cursor:pointer; }
+  .knife:hover { background:#511; }
+  #log { margin-top:1.5em; font-size:0.9em; color:#aaa; }
+  button { margin:0.4em; padding:0.8em 1.2em; background:#400; color:white; border:none; border-radius:6px; cursor:pointer; }
+  button:hover { background:#700; }
+</style>
+</head>
+<body>
+<div id="game">
+  <h1>FEELING BLASTER ∞</h1>
+  <p><strong>DANGER RIGHT NOW</strong><br>Which knife is in your chest?</p>
+
+  <div class="knife" onclick="pick(1)">1. She’s done with me</div>
+  <div class="knife" onclick="pick(2)">2. I just raged and hate myself</div>
+  <div class="knife" onclick="pick(3)">3. I’m a worthless failure</div>
+  <div class="knife" onclick="pick(4)">4. I want to die</div>
+  <div class="knife" onclick="pick(5)">5. I’m trapped, no moves left</div>
+  <div class="knife" onclick="pick(6)">6. Someone just humiliated me</div>
+
+  <div id="after" style="display:none; margin-top:2em;">
+    <p id="msg"></p>
+    <p>Button size: <span id="size">100</span>%</p>
+    <button onclick="restart()">Survive another night</button>
+    <button onclick="share()">Share this door</button>
+  </div>
+
+  <div id="log"></div>
+</div>
+
+<script>
+const knives = [
+  "", // index 0 dummy
+  "She’s done with me",
+  "I just raged and hate myself",
+  "I’m a worthless failure",
+  "I want to die",
+  "I’m trapped, no moves left",
+  "Someone just humiliated me"
+];
+
+let data = JSON.parse(localStorage.getItem('fb')) || {runs:0, button:100, history:[]};
+
+function pick(n) {
+  data.runs++;
+  data.history.push({date:new Date().toLocaleDateString(), knife:n});
+  const shrink = Math.floor(15 + Math.random()*10); // 15-25% shrink per honest pick
+  data.button = Math.max(5, data.button - shrink);
+
+  document.getElementById('msg').innerHTML = `
+    <strong>You picked #\( {n}: \){knives[n]}</strong><br><br>
+    You are not crazy.<br>
+    That same knife has been pulled out of my chest more times than I can count.<br><br>
+    Tonight you named it instead of letting it end you.<br>
+    The button just shrank <strong>${shrink}%</strong>.
+  `;
+  document.getElementById('size').textContent = data.button;
+  document.querySelectorAll('.knife').forEach(el=>el.style.display='none');
+  document.getElementById('after').style.display='block';
+  document.getElementById('log').innerHTML = `<small>Run #\( {data.runs} – \){new Date().toLocaleString()}</small>`;
+
+  localStorage.setItem('fb', JSON.stringify(data));
+}
+
+function restart() {
+  location.reload();
+}
+
+function share() {
+  const text = `Feeling Blaster ∞ – Door ∞ is open tonight.\nIf you're bleeding, walk through.\nhttps://YOUR-URL-HERE`;
+  navigator.clipboard.writeText(text);
+  alert("Link + message copied. Paste it wherever men are breaking tonight.");
+}
+</script>
+
+<small style="position:absolute; bottom:10px; color:#555;">
+  Open source • Made by two survivors who made it to 57 and beyond • MIT license
+</small>
+</body>
+</html>
