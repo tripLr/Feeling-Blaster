@@ -88,18 +88,22 @@ function pick(n) {
   data.joy = Math.min(100, data.joy + joyGain);
   data.history.push({date:new Date().toLocaleString(), knife:n, hpGain, hapGain, joyGain});
 
-  document.getElementById('msg').innerHTML = `You named <strong>#\( {n}: \){knives[n]}</strong><br><br>You're still breathing.<br>That's the only score that matters tonight.`;
-  document.getElementById('hpGain').textContent = "+"+hpGain;
-  document.getElementById('hapGain').textContent = "+"+hapGain;
-  document.getElementById('joyGain').textContent = "+"+joyGain;
+  // Bulletproof string concat — no template literals
+  var knifeText = knives[n];
+  var msg = 'You named <strong>#' + n + ': ' + knifeText + '</strong><br><br>You're still breathing.<br>That\'s the only score that matters tonight.';
+  document.getElementById('msg').innerHTML = msg;
+  document.getElementById('hpGain').textContent = '+' + hpGain;
+  document.getElementById('hapGain').textContent = '+' + hapGain;
+  document.getElementById('joyGain').textContent = '+' + joyGain;
 
   localStorage.setItem('fb', JSON.stringify(data));
   updateStats();
 
   document.querySelector('.knives').style.display='none';
   document.getElementById('game').style.display='block';
-  setTimeout(()=>document.getElementById('support').style.display='block', 1500);
+  setTimeout(function(){document.getElementById('support').style.display='block';}, 1500);
 }
+
 
 function updateStats() {
   document.getElementById('hp').textContent = data.hp;
