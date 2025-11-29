@@ -58,16 +58,20 @@ function pick(n) {
   data.hp = Math.min(100, data.hp + hpGain);
   data.hap = Math.min(100, data.hap + hapGain);
   data.joy = Math.min(100, data.joy + joyGain);
-  data.history.push({date:new Date().toLocaleString(), vault:"Pain", knife:n, hpGain, hapGain, joyGain});
+  data.history.push({date:new Date().toLocaleString(), vault:"PainVault", knife:n, hpGain, hapGain, joyGain});
 
-  document.getElementById('hpGain').textContent = "+"+hpGain;
-  document.getElementById('hapGain').textContent = "+"+hapGain;
-  document.getElementById('joyGain').textContent = "+"+joyGain;
+  // Bulletproof string concat
+  var knifeText = knives[n];  // Add this line (define knives array at top if missing)
+  var msg = 'You faced <strong>#' + n + ': ' + knifeText + '</strong><br><br>The Loss System lost a round tonight.';
+  document.getElementById('msg').innerHTML = msg;  // Update #msg if you have one, or adjust
+  document.getElementById('hpGain').textContent = '+' + hpGain;
+  document.getElementById('hapGain').textContent = '+' + hapGain;
+  document.getElementById('joyGain').textContent = '+' + joyGain;
 
   localStorage.setItem('fb', JSON.stringify(data));
   document.querySelector('.knives').style.display='none';
   document.getElementById('game').style.display='block';
-  setTimeout(()=>document.getElementById('next').style.display='block', 2000);
+  setTimeout(function(){document.getElementById('next').style.display='block';}, 2000);
 }
 
 function downloadCSV() {
