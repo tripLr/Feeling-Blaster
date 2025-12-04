@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<title>Feeling Blaster v1.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body{margin:0;background:#000;color:#ddd;font-family:monospace;padding:1.5rem;text-align:center;line-height:1.7;}
+  h1{color:#f44;margin:1rem 0;font-size:2.2em;}
+  .list{max-width:460px;margin:2rem auto;}
+  .btn{display:block;width:100%;padding:1.4rem;margin:0.9rem 0;font-size:1.3em;
+       background:#222;border:2px solid #555;border-radius:12px;cursor:pointer;transition:0.3s;}
+  .btn:hover{transform:scale(1.03);border-color:#f84;}
+  #result{margin:3rem 0;font-size:1.5em;color:#f84;}
+  #loop{font-size:1.2em;margin:2rem 0;}
+  #kicker{font-size:1.1em;color:#aaa;margin:2rem 0;}
+  button{background:#400;color:white;padding:1rem 2rem;margin:1rem;border:none;border-radius:8px;cursor:pointer;}
+  button:hover{background:#900;}
+  footer{margin-top:5rem;color:#666;font-size:0.9em;}
+</style>
+</head>
+<body>
+
+<h1>FEELING BLASTER</h1>
+<p>Build your truth. One word at a time.</p>
+
+<div id="lists" class="list"></div>
+
+<div id="result" style="display:none;"></div>
+<div id="loop" style="display:none;"></div>
+<div id="kicker" style="display:none;"></div>
+
+<button id="restart" style="display:none;" onclick="location.reload()">Start over</button>
+
+<footer>v1.0 • three lists • no notifications • <a href="https://github.com/tripLr/Feeling-Blaster" style="color:#666;">source</a></footer>
+
+<script>
+const subjects = ["I","My wife","My husband","My partner","My ex","My child","My boss","My friend","My dad","My mom","My pastor","We","Our family"];
+const actions = ["left","said","raged","fired","ignored","humiliated","loved","helped","betrayed","abandoned","believed in me","supported","hurt","chose","listened","walked away","stood up","fell","climbed"];
+const results = [
+  "hate myself","feel empty","want to die","feel peace","doubt everything","feel connected","feel worthless","feel seen","feel trapped","feel free",
+  "raged","shut down","tried harder","gave up","reached out","walked away","chose to stay","chose to leave"
+];
+
+let chain = [];
+
+function showList(items, title){
+  const div = document.getElementById('lists');
+  div.innerHTML = `<p>${title}</p>`;
+  items.forEach(item=>{
+    const btn = document.createElement('div');
+    btn.className='btn';
+    btn.textContent=item;
+    btn.onclick=()=>select(item);
+    div.appendChild(btn);
+  });
+}
+
+function select(word){
+  chain.push(word);
+  document.getElementById('lists').style.display='none';
+
+  if(chain.length === 1){
+    showList(actions, "What happened?");
+  }else if(chain.length === 2){
+    showList(results, "What came next?");
+  }else{
+    showResult();
+  }
+}
+
+function showResult(){
+  const sentence = chain.join(' → ') + '.';
+  document.getElementById('result').textContent = sentence;
+  document.getElementById('result').style.display='block';
+
+  const last = chain[chain.length-1];
+  const isEmotion = !actions.includes(last) && !subjects.includes(last);
+  const loop = (last==="hate myself"||last==="doubt everything"||last==="want to die"||last==="feel trapped")
+    ? "RSD spiral – back to the pit."
+    : (last==="feel peace"||last==="feel connected"||last==="feel free")
+      ? "Walking the grass."
+      : "Neutral – keep going.";
+
+  document.getElementById('loop').textContent = loop;
+  document.getElementById('loop').style.display='block';
+
+  document.getElementById('kicker').innerHTML = 
+    `You just named the exact chain millions of us have lived.<br>
+     The man who built this app lived it too — at 57 he’s still climbing.<br>
+     You’re not alone.<br>
+     You’re not broken.<br>
+     You just made the first real choice.`;
+  document.getElementById('kicker').style.display='block';
+
+  document.getElementById('restart').style.display='inline-block';
+}
+
+showList(subjects, "Who is this about?");
+</script>
+</body>
+</html>
